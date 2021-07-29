@@ -26,7 +26,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate{
 
     @IBAction func searchPressed(_ sender: UIButton) {
         searchTextField.endEditing(true) // dismisses the keyboard
-        print(searchTextField.text!)
+        
     }
     
     // Asks the delegate if the text field should process the pressing of the return key/button
