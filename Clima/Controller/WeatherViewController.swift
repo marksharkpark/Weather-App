@@ -8,7 +8,9 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate{
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate{
+
+    
 // The Text Field Delegate allows us to manage editing and validation of a text in a text field object
     
     @IBOutlet weak var searchTextField: UITextField!
@@ -20,6 +22,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        weatherManager.delegate = self // set the current class as the delegate 
         
         searchTextField.delegate = self // the text field can communicate with the view controller by setting the view controller as the delegate
     }
@@ -52,6 +55,11 @@ class WeatherViewController: UIViewController, UITextFieldDelegate{
             weatherManager.fetchWeather(cityName: city)
         }
         searchTextField.text = ""
+    }
+    
+    func didUpdateWeather(weather: WeatherModel){
+        print(weather.tempatureString)
+        print(weather.conditionName)
     }
     
 }
