@@ -7,9 +7,11 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherManagerDelegate {
-    func didUpdateWeather(weather: WeatherModel) // requirements
+    func didUpdateWeather(weatherManager: WeatherManager, weather: WeatherModel) // requirements
+    func didFailWithError(error: Error)
 }
 
 struct WeatherManager{
@@ -20,10 +22,15 @@ struct WeatherManager{
     
     func fetchWeather(cityName: String){
         let urlString = "\(weatherURL)&q=\(cityName)" // attaching cityname to API call
-        self.performRequest(urlString: urlString)
+        self.performRequest(with: urlString)
     }
     
-    func performRequest(urlString: String){
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees){
+        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitude)"
+        self.performRequest(with: urlString)
+    }
+    
+    func performRequest(with urlString: String){
         //1. Create url
         if let url = URL(string: urlString){
             //2. Create a URLSession
@@ -31,13 +38,14 @@ struct WeatherManager{
             //3. Give the session a task
             let task = session.dataTask(with: url) { (data, response, error) in
                 if error != nil {
-                    print(error!)
+                    self.delegate?.didFailWithError(error: error!) // inside of closure, thus we include self
                     return
                 }
                 // Convert JSON format into readible format.
                 if let safeData = data {
-                    if let weather = self.parseJSON(weatherData: safeData){
-                        self.delegate?.didUpdateWeather(weather: weather) // we need self bc we are within a closure
+                    if let weather = self.parseJSON(safeData){
+                        self.delegate?.didUpdateWeather(weatherManager: self, weather: weather) // we need self bc we are within a closure
+                        // we call the delegate to use the didUpdateWeather function that lives within our weatherviewcontroller
                     }
                 }
             }
@@ -46,7 +54,7 @@ struct WeatherManager{
         }
     }
     
-    func parseJSON(weatherData: Data) -> WeatherModel?{
+    func parseJSON(_ weatherData: Data) -> WeatherModel?{
         let decoder = JSONDecoder()
         do{
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
@@ -59,7 +67,7 @@ struct WeatherManager{
 
             
         } catch {
-            print(error)
+            self.delegate?.didFailWithError(error: error) // inside of closure, thus we include self
             return nil
         }
     }
