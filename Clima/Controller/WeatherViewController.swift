@@ -19,18 +19,18 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var cityLabel: UILabel!
     
     var weatherManager = WeatherManager()
-    let locationManager = CLLocationManager() // grabs crrent location from the phone
-    
+    let locationManager = CLLocationManager() // grabs current location from the phone
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        locationManager.delegate = self
+        locationManager.delegate = self // set the current class as the delgate
         locationManager.requestWhenInUseAuthorization() // requests User for permission
         locationManager.requestLocation() // after obtaining location fix, it calls the delegate didUpdateLocation method with result
-        
-        
         weatherManager.delegate = self // set the current class as the delegate
         searchTextField.delegate = self // the text field can communicate with the view controller by setting the view controller as the delegate
+    }
+    @IBAction func currentLocationPressed(_ sender: UIButton) {
+        locationManager.requestLocation() // calling didUpdateLocation()
     }
 }
 
@@ -41,10 +41,12 @@ extension WeatherViewController: UITextFieldDelegate{
         searchTextField.endEditing(true) // dismisses the keyboard
     }
     
-    // Asks the delegate if the text field should process the pressing of the return key/button
+    // Asks the delegate we would accept the return key as a means to search.
+    // TRUE -> Yes.
+    // FALSE -> No.
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTextField.endEditing(true) // dismisses the keyboard
-        return true // allow the text field to be allowed to return
+        return true
     }
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
@@ -59,7 +61,7 @@ extension WeatherViewController: UITextFieldDelegate{
     
     // Clearing text field text
     func textFieldDidEndEditing(_ textField: UITextField) {
-        //Use searchTextField.text to get the weather for that city
+        // Beginning to start up the search process in order to retrieve weather data for requested city.
         if let city = searchTextField.text {
             weatherManager.fetchWeather(cityName: city)
         }
@@ -85,12 +87,12 @@ extension WeatherViewController: WeatherManagerDelegate {
 //MARK: - CLLocationManagerDelegate
 
 extension WeatherViewController: CLLocationManagerDelegate {
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
+        if let location = locations.last { // the last item in the array will be the most latest one
+            locationManager.stopUpdatingLocation() // stops generation of location updates
             let lat = location.coordinate.latitude
             let lon = location.coordinate.longitude
-            print(lat)
-            print(lon)
             weatherManager.fetchWeather(latitude: lat, longitude: lon)
         }
     }

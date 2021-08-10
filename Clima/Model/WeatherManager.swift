@@ -9,8 +9,13 @@
 import Foundation
 import CoreLocation
 
+
+/*
+ PURPOSE:
+ 
+ */
 protocol WeatherManagerDelegate {
-    func didUpdateWeather(weatherManager: WeatherManager, weather: WeatherModel) // requirements
+    func didUpdateWeather(weatherManager: WeatherManager, weather: WeatherModel) // requirements for the WeatherManagerDelegate
     func didFailWithError(error: Error)
 }
 
@@ -31,11 +36,8 @@ struct WeatherManager{
     }
     
     func performRequest(with urlString: String){
-        //1. Create url
         if let url = URL(string: urlString){
-            //2. Create a URLSession
             let session = URLSession(configuration: .default) // creates our URL session object
-            //3. Give the session a task
             let task = session.dataTask(with: url) { (data, response, error) in
                 if error != nil {
                     self.delegate?.didFailWithError(error: error!) // inside of closure, thus we include self
@@ -54,6 +56,7 @@ struct WeatherManager{
         }
     }
     
+    // Parsing the JSON using the JSON Viewer Pro in order to populate our WeatherModel attributes
     func parseJSON(_ weatherData: Data) -> WeatherModel?{
         let decoder = JSONDecoder()
         do{
