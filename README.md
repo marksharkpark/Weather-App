@@ -1,5 +1,2 @@
 # Weather-App
-An iOS application that displays real-time temperature and weather-cast for a requested area. 
-This application implements protocols, the Delegate Design pattern, closures, extensions, and computed properites to efficiently create a full functioning iOS application. 
-The RESTful API I used to retrieve real-time data regarding the weather was OpenWeatherMap. 
-
+An iOS app that shows the current temperature and weather forecast for a certain location. To effectively construct a fully functional iOS application, this app uses protocols, the Delegate Design pattern, closures, extensions, and computed properties. OpenWeatherMap was the RESTful API that I utilized to retrieve real-time weather data.
